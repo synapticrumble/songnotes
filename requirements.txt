@@ -1,0 +1,2 @@
+mammoth==1.11.0
+markdown==3.10.0
