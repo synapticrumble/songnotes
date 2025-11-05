@@ -4,22 +4,44 @@ import subprocess
 from datetime import datetime
 
 # === CONFIG ===
-INPUT_DOCX = "P:\\ShareDownloads\\BansuriMusic.docx"
+INPUT_DOCX = "P:\\ShareDownloads\\songnotes\\songs_reformatted.docx"
 OUTPUT_HTML = "P:\\ShareDownloads\\songnotes\\song_notations.html"
 REPO_PATH = "."  # current folder
 COMMIT_MESSAGE = f"Auto-update HTML from Word on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 
 def convert_docx_to_html(input_path, output_path):
-    """Convert a .docx file to clean HTML using mammoth"""
     with open(input_path, "rb") as docx_file:
         result = mammoth.convert_to_html(docx_file)
         html = result.value
-        messages = result.messages
+    # add no-copy script
+    protect_js = """
+    <style>
+    body { user-select: none; -webkit-user-select: none; }
+    </style>
+    <script>
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('paste', e => e.preventDefault());
+    </script>
+    """
+    html = html + protect_js
     with open(output_path, "w", encoding="utf-8") as html_file:
         html_file.write(html)
-    print(f"✅ Converted {input_path} → {output_path}")
-    if messages:
-        print("Messages:", messages)
+    print(f"✅ Converted and protected {input_path} → {output_path}")
+
+
+# def convert_docx_to_html(input_path, output_path):
+#     """Convert a .docx file to clean HTML using mammoth"""
+#     with open(input_path, "rb") as docx_file:
+#         result = mammoth.convert_to_html(docx_file)
+#         html = result.value
+#         messages = result.messages
+#     with open(output_path, "w", encoding="utf-8") as html_file:
+#         html_file.write(html)
+#     print(f"✅ Converted {input_path} → {output_path}")
+#     if messages:
+#         print("Messages:", messages)
 
 def git_commit_and_push(repo_path, message):
     """Commit and push changes to GitHub"""
