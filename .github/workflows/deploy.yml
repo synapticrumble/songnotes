@@ -1,0 +1,56 @@
+name: Convert and Deploy Song Notations
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'songs_reformatted.docx'
+      - 'reformat.py'
+      - 'convert_and_push.py'
+      - 'render_and_watermark.py'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  convert-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Install Playwright browsers
+      run: |
+        playwright install chromium
+        
+    - name: Convert DOCX to HTML
+      run: |
+        python convert_and_push.py
+        
+    - name: Generate PNG and Watermark
+      run: |
+        python render_and_watermark.py
+        
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add output/
+        git diff --staged --quiet || git commit -m "Auto-update: Generated HTML and PNG from DOCX [$(date)]"
+        git push
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./output
+        publish_branch: gh-pages
