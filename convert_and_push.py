@@ -4,9 +4,13 @@ import subprocess
 from datetime import datetime
 
 # === CONFIG ===
+REPO_PATH = os.path.dirname(os.path.abspath(__file__))
+INPUT_DOCX = os.path.join(REPO_PATH, "songs_reformatted.docx")
+OUTPUT_HTML = os.path.join(REPO_PATH, "songs_reformatted.html")
+
 # INPUT_DOCX = "P:\\ShareDownloads\\songnotes\\songs_reformatted.docx"
 # OUTPUT_HTML = "P:\\ShareDownloads\\songnotes\\song_notations.html"
-REPO_PATH = "."  # current folder
+# REPO_PATH = "."  # current folder
 COMMIT_MESSAGE = f"Auto-update HTML from Word on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
 
 def convert_docx_to_html(input_path, output_path):
