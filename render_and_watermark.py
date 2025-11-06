@@ -13,7 +13,7 @@ async def html_to_png(html_file, png_file):
     """Convert HTML file to PNG screenshot"""
     try:
         if not html_file.exists():
-            print(f"❌ HTML file not found: {html_file}")
+            print(f"[ERROR] HTML file not found: {html_file}")
             return False
             
         async with async_playwright() as p:
@@ -35,18 +35,18 @@ async def html_to_png(html_file, png_file):
             )
             await browser.close()
             
-        print(f"📸 Successfully rendered: {png_file}")
+        print(f"[OK] Successfully rendered: {png_file}")
         return True
         
     except Exception as e:
-        print(f"❌ Error rendering HTML to PNG: {e}")
+        print(f"[ERROR] Error rendering HTML to PNG: {e}")
         return False
 
 def watermark_image(png_path, wm_path, text="© 2025 Bansuri Notations"):
     """Add watermark to PNG image"""
     try:
         if not png_path.exists():
-            print(f"❌ PNG file not found: {png_path}")
+            print(f"[ERROR] PNG file not found: {png_path}")
             return False
             
         # Open image and convert to RGBA
@@ -86,33 +86,42 @@ def watermark_image(png_path, wm_path, text="© 2025 Bansuri Notations"):
         final_img = watermarked.convert("RGB")
         final_img.save(wm_path, "PNG", optimize=True)
         
-        print(f"💧 Watermark added: {wm_path}")
+        print(f"[OK] Watermark added: {wm_path}")
         return True
         
     except Exception as e:
-        print(f"❌ Error adding watermark: {e}")
+        print(f"[ERROR] Error adding watermark: {e}")
         return False
 
 async def main():
     """Main execution function"""
-    print("🎵 Starting PNG generation process...")
+    print("[INFO] Starting PNG generation process...")
     
     # Ensure output directory exists
     PNG_FILE.parent.mkdir(exist_ok=True)
     
+    # Check if HTML file exists, if not suggest running the pipeline
+    if not HTML_FILE.exists():
+        print(f"[ERROR] HTML file not found: {HTML_FILE}")
+        print("[INFO] Please run the conversion pipeline first:")
+        print("   1. python reformat.py")
+        print("   2. python convert_and_push.py")
+        print("   3. python render_and_watermark.py")
+        sys.exit(1)
+    
     # Step 1: Convert HTML to PNG
     success = await html_to_png(HTML_FILE, PNG_FILE)
     if not success:
-        print("❌ Failed to generate PNG from HTML")
+        print("[ERROR] Failed to generate PNG from HTML")
         sys.exit(1)
     
     # Step 2: Add watermark
     success = watermark_image(PNG_FILE, WM_FILE)
     if not success:
-        print("❌ Failed to add watermark")
+        print("[ERROR] Failed to add watermark")
         sys.exit(1)
     
-    print("✅ PNG generation completed successfully!")
+    print("[OK] PNG generation completed successfully!")
 
 if __name__ == "__main__":
     asyncio.run(main())
