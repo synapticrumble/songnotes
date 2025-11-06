@@ -28,6 +28,15 @@ def convert_docx_to_html(input_path, output_path):
     document.addEventListener('cut', e => e.preventDefault());
     document.addEventListener('paste', e => e.preventDefault());
     </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXX');
+    </script>
+
     """
     html = html + protect_js
     with open(output_path, "w", encoding="utf-8") as html_file:
