@@ -8,7 +8,13 @@ on:
       - 'reformat.py'
       - 'convert_and_push.py'
       - 'render_and_watermark.py'
+      - 'run_pipeline.py'
   workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   convert-and-deploy:
@@ -17,9 +23,13 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        persist-credentials: true
+        fetch-depth: 0
+        
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
         
@@ -32,18 +42,16 @@ jobs:
       run: |
         playwright install chromium
         
-    - name: Convert DOCX to HTML
+    - name: Run Complete Pipeline
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        python convert_and_push.py
-        
-    - name: Generate PNG and Watermark
-      run: |
-        python render_and_watermark.py
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        python run_pipeline.py
         
     - name: Commit and push changes
       run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
         git add output/
         git diff --staged --quiet || git commit -m "Auto-update: Generated HTML and PNG from DOCX [$(date)]"
         git push
