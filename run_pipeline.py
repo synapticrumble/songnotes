@@ -1,49 +1,67 @@
-#!/usr/bin/env python3
-"""
-Master pipeline script - runs all processing steps in order
-"""
+import os
 import subprocess
 import sys
-from pathlib import Path
+from datetime import datetime
 
-def run_script(script_name):
-    """Run a Python script and handle errors"""
+def run_step(description, command):
+    """Run a subprocess step with logging and error capture."""
+    print(f"[INFO] Running {description}...")
     try:
-        print(f"[INFO] Running {script_name}...")
-        result = subprocess.run([sys.executable, script_name], 
-                              capture_output=True, text=True, check=True)
-        print(f"[OK] {script_name} completed successfully")
-        if result.stdout.strip():
-            print(result.stdout.strip())
+        subprocess.run(command, check=True)
+        print(f"[✅] {description} completed successfully.")
         return True
     except subprocess.CalledProcessError as e:
-        print(f"[ERROR] {script_name} failed:")
-        if e.stderr:
-            print(e.stderr)
-        if e.stdout:
-            print(e.stdout)
+        print(f"[❌] {description} failed:\n{e}")
         return False
 
+
+def process_docx_if_available():
+    """Process the BansuriMusic.docx if found, otherwise skip."""
+    # Local and GitHub paths
+    local_input = r"P:\ShareDownloads\BansuriMusic.docx"
+    repo_input = "input/BansuriMusic.docx"
+    output_file = "output/BansuriMusic_reformatted.docx"
+
+    # Resolve actual existing file
+    if os.path.exists(local_input):
+        input_file = local_input
+        print(f"[INFO] Found local input file: {input_file}")
+    elif os.path.exists(repo_input):
+        input_file = repo_input
+        print(f"[INFO] Found repo input file: {input_file}")
+    else:
+        print("[⚠️] Input DOCX not found. Skipping reformat step.")
+        return True  # skip gracefully instead of erroring out
+
+    # Call reformat.py
+    result = run_step("reformat.py", [sys.executable, "reformat.py", input_file, output_file])
+    return result
+
+
 def main():
-    """Run the complete pipeline"""
     print("[INFO] Starting complete Bansuri processing pipeline...")
-    
-    scripts = [
-        "reformat.py",
-        "convert_and_push.py", 
-        "render_and_watermark.py"
+
+    steps = [
+        ("Reformat Word document", process_docx_if_available),
+        ("Convert DOCX → HTML", lambda: run_step("convert_and_push.py", [sys.executable, "convert_and_push.py"])),
+        ("Post-process HTML protection", lambda: run_step("protect_html.py", [sys.executable, "protect_html.py"])),
     ]
-    
-    for script in scripts:
-        if not Path(script).exists():
-            print(f"[ERROR] Script not found: {script}")
-            continue
-            
-        if not run_script(script):
-            print(f"[ERROR] Pipeline failed at {script}")
-            sys.exit(1)
-    
-    print("[OK] Complete pipeline finished successfully!")
+
+    success_all = True
+    for desc, func in steps:
+        print(f"\n[STEP] {desc}")
+        success = func()
+        if not success:
+            success_all = False
+            # Do not exit early; continue to next step
+
+    print("\n" + "=" * 60)
+    if success_all:
+        print("[🎉] Pipeline completed successfully at", datetime.now())
+    else:
+        print("[⚠️] Pipeline finished with some errors at", datetime.now())
+    print("=" * 60)
+
 
 if __name__ == "__main__":
     main()
