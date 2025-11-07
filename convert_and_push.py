@@ -45,7 +45,7 @@ def convert_docx_to_html(input_path, output_path):
 // Add this to your GitHub Pages
 (function() {
     // REPLACE with your actual Apps Script URL from deployment
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/1CywmhduDgwzqZZqT6Vm4IVt4AMYK3vVgKsBMUp_Oi8e4S8ljsG3tJmPG/exec';
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwGFfXSdedzdtKzuupgNGoYupf3yVmEN4fSi-NWPpz8d9RPNn3I-85Jk15AdG_YSD9w/exec';
     
     const visitData = {
         url: window.location.href,
