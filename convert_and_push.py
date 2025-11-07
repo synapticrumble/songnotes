@@ -32,6 +32,20 @@ def convert_docx_to_html(input_path, output_path):
     document.addEventListener('paste', e => e.preventDefault());
     </script>
 
+    <script>
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5LGWwJ-k8dtuYR1_Za9UU3wgW5D-1b3LAYjlbe4VxV6vc7DNYNsp-nZGSMoXrkPUq/exec';
+    
+    fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            page: window.location.href,
+            time: new Date().toISOString()
+        })
+    });
+    </script>
+
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
