@@ -18,8 +18,8 @@ def run_step(description, command):
 def process_docx_if_available():
     """Process the BansuriMusic.docx if found, otherwise skip."""
     # Local and GitHub paths
-    local_input = r"P:\ShareDownloads\BansuriMusic.docx"
-    repo_input = "input/BansuriMusic.docx"
+    local_input = r"P:\\ShareDownloads\\BansuriMusic.docx"
+    repo_input = "./BansuriMusic.docx"
     output_file = "./songs_reformatted.docx"
 
     # Resolve actual existing file
