@@ -9,20 +9,6 @@
     document.addEventListener('paste', e => e.preventDefault());
     </script>
 
-    <script>
-    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw5LGWwJ-k8dtuYR1_Za9UU3wgW5D-1b3LAYjlbe4VxV6vc7DNYNsp-nZGSMoXrkPUq/exec';
-    
-    fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            page: window.location.href,
-            time: new Date().toISOString()
-        })
-    });
-    </script>
-
-
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX"></script>
     <script>
     window.dataLayer = window.dataLayer || [];
@@ -30,5 +16,40 @@
     gtag('js', new Date());
     gtag('config', 'G-XXXXXXX');
     </script>
+
+
+    <script>
+// Add this to your GitHub Pages
+(function() {
+    // REPLACE with your actual Apps Script URL from deployment
+    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxexIuN99-anjKyMhITQF-nrda2fPZV4gbak8i0kRA/exec';
+    
+    const visitData = {
+        url: window.location.href,
+        title: document.title,
+        timestamp: new Date().toISOString(),
+        referrer: document.referrer || 'direct',
+        screen: `${screen.width}x${screen.height}`,
+        language: navigator.language
+    };
+    
+    // Use sendBeacon for better reliability
+    if (navigator.sendBeacon) {
+        const blob = new Blob([JSON.stringify(visitData)], {type: 'application/json'});
+        navigator.sendBeacon(APPS_SCRIPT_URL, blob);
+    } else {
+        // Fallback to fetch
+        fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Origin': window.location.origin
+            },
+            body: JSON.stringify(visitData),
+            mode: 'no-cors' // Important for cross-origin requests
+        }).catch(err => console.log('Visit tracking failed:', err));
+    }
+})();
+</script>
 
     
