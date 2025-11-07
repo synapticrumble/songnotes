@@ -44,7 +44,7 @@ def main():
     steps = [
         ("Reformat Word document", process_docx_if_available),
         ("Convert DOCX → HTML", lambda: run_step("convert_and_push.py", [sys.executable, "convert_and_push.py"])),
-        ("Post-process HTML protection", lambda: run_step("protect_html.py", [sys.executable, "protect_html.py"])),
+        ("Post-process HTML protection", lambda: run_step("render_and_watermark.py", [sys.executable, "render_and_watermark.py"])),
     ]
 
     success_all = True
