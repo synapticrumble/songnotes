@@ -20,7 +20,7 @@ def process_docx_if_available():
     # Local and GitHub paths
     local_input = r"P:\ShareDownloads\BansuriMusic.docx"
     repo_input = "input/BansuriMusic.docx"
-    output_file = "output/BansuriMusic_reformatted.docx"
+    output_file = "./songs_reformatted.docx"
 
     # Resolve actual existing file
     if os.path.exists(local_input):
